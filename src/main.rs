@@ -30,20 +30,55 @@ fn main() {
     let ending_range:u64 = ending_range.trim().parse().expect("Expected a number");
 
     // 8 core system. so let's divide the task into eight threads.
-    let total_numbers = ending_range - starting_range;
-    let equal_partition = total_numbers/8; 
-
     let rec = {
             let (tx, rx) = mpsc::channel();
-            for i in 1..9 {
+            let total_numbers = ending_range - starting_range;
+            let equal_partition = total_numbers/8; 
+            for i in starting_range..ending_range + 1 {
                 let tx1 = tx.clone();
                 spawn(move || {
-                    tx1.send(1).unwrap();
+                    for j in starting_range..starting_range + equal_partition {
+                        if isPrime(j) {
+                            tx1.send(j).unwrap();
+                        }
+                    }
+                });
+                let tx2 = tx.clone();
+                spawn(move || {
+                    for j in starting_range + equal_partition + 1..starting_range + equal_partition*{
+                        if isPrime(j) {
+                            tx2.send(j).unwrap();
+                        }
+                    }
+                });
+                let tx3 = tx.clone();
+                spawn(move || {
+                    tx3.send(1).unwrap();
+                });
+                let tx4 = tx.clone();
+                spawn(move || {
+                    tx4.send(1).unwrap();
+                });
+                let tx5 = tx.clone();
+                spawn(move || {
+                    tx5.send(1).unwrap();
+                });
+                let tx6 = tx.clone();
+                spawn(move || {
+                    tx6.send(1).unwrap();
+                });
+                let tx7 = tx.clone();
+                spawn(move || {
+                    tx7.send(1).unwrap();
+                });
+                let tx8 = tx.clone();
+                spawn(move || {
+                    tx8.send(1).unwrap();
                 });
             }
             rx
     };
-    
+
 
     // 2 to 500
     // 498
