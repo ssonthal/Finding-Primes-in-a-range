@@ -1,11 +1,11 @@
 use std::sync::mpsc;
-use std::thread::{spawn};
+use std::thread::spawn;
 
 
 
 
-fn isPrime(num:u64) -> bool{
-    for i in 2..num/2 {
+fn is_prime(num:u64) -> bool {
+    for i in 2..num/2 + 1 {
         if num % i == 0{
             return false;
         }
@@ -30,54 +30,93 @@ fn main() {
     let ending_range:u64 = ending_range.trim().parse().expect("Expected a number");
 
     // 8 core system. so let's divide the task into eight threads.
-    let rec = {
+    // let rec = {
             let (tx, rx) = mpsc::channel();
             let total_numbers = ending_range - starting_range;
             let equal_partition = total_numbers/8; 
-            for i in starting_range..ending_range + 1 {
-                let tx1 = tx.clone();
-                spawn(move || {
-                    for j in starting_range..starting_range + equal_partition {
-                        if isPrime(j) {
-                            tx1.send(j).unwrap();
-                        }
+
+            let tx1 = tx.clone();
+            spawn(move || {
+                for j in starting_range..starting_range + equal_partition {
+                    if is_prime(j) {
+                        tx1.send(j).unwrap();
                     }
-                });
-                let tx2 = tx.clone();
-                spawn(move || {
-                    for j in starting_range + equal_partition + 1..starting_range + equal_partition*{
-                        if isPrime(j) {
-                            tx2.send(j).unwrap();
-                        }
+                }
+            });
+            let tx2 = tx.clone();
+            spawn(move || {
+                let x = starting_range + equal_partition + 1;
+                for j in x..x + equal_partition {
+                    if is_prime(j) {
+                        tx2.send(j).unwrap();
                     }
-                });
-                let tx3 = tx.clone();
-                spawn(move || {
-                    tx3.send(1).unwrap();
-                });
-                let tx4 = tx.clone();
-                spawn(move || {
-                    tx4.send(1).unwrap();
-                });
-                let tx5 = tx.clone();
-                spawn(move || {
-                    tx5.send(1).unwrap();
-                });
-                let tx6 = tx.clone();
-                spawn(move || {
-                    tx6.send(1).unwrap();
-                });
-                let tx7 = tx.clone();
-                spawn(move || {
-                    tx7.send(1).unwrap();
-                });
-                let tx8 = tx.clone();
-                spawn(move || {
-                    tx8.send(1).unwrap();
-                });
-            }
-            rx
-    };
+                }
+            });
+            let tx3 = tx.clone();
+            spawn(move || {
+                let x = starting_range + 2*equal_partition + 1;
+                for j in x..x + equal_partition {
+                    if is_prime(j) {
+                        tx3.send(j).unwrap();
+                    }
+                }
+            });
+            let tx4 = tx.clone();
+            spawn(move || {
+                let x = starting_range + 3*equal_partition + 1;
+                for j in x..x + equal_partition {
+                    if is_prime(j) {
+                        tx4.send(j).unwrap();
+                    }
+                }
+            });
+            let tx5 = tx.clone();
+            spawn(move || {
+                let x = starting_range + 4*equal_partition + 1;
+                for j in x..x + equal_partition {
+                    if is_prime(j) {
+                        tx5.send(j).unwrap();
+                    }
+                }
+            });
+            let tx6 = tx.clone();
+            spawn(move || {
+                let x = starting_range + 5*equal_partition + 1;
+                for j in x..x + equal_partition {
+                    if is_prime(j) {
+                        tx6.send(j).unwrap();
+                    }
+                }
+            });
+            let tx7 = tx.clone();
+            spawn(move || {
+                let x = starting_range + 6*equal_partition + 1;
+                for j in x..x + equal_partition {
+                    if is_prime(j) {
+                        tx7.send(j).unwrap();
+                    }
+                }
+            });
+            let tx8 = tx.clone();
+            spawn(move || {
+                let x = starting_range + 7*equal_partition + 1;
+                for j in x..ending_range {
+                    if is_prime(j) {
+                        tx8.send(j).unwrap();
+                    }
+                }
+            });
+        // };
+        // all senders should go out of scope before the receiver. they can't go out of scope together. So it's important to drop tx from the main function ends. 
+        drop(tx);
+        let mut ans = Vec::new();
+        for res in rx {
+            ans.push(res);
+        }
+        ans.sort();
+        println!("{:?}", ans);
+    
+    }
 
 
     // 2 to 500
@@ -91,6 +130,3 @@ fn main() {
     // 317 + 62 => 379 => 6th thread
     // 380 + 62 => 442 => 7th thread
     // 443 ... 500 tak => 8th thread
-    
-
-}
